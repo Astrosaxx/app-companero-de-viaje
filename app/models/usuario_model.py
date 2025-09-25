@@ -54,8 +54,8 @@ class Usuario:
         """
         Buscar un usuario por su ID
         """
-        query ="SELECT * FROM usuarios WHERE id = %(id)s;"
-        data = {'id' : usuario_id}
+        query = "SELECT * FROM usuarios WHERE id = %(id)s;"
+        data = {"id": usuario_id}
         resultado = connectToMySQL(cls.db).query_db(query, data)
         if not resultado:
             return None
@@ -108,6 +108,19 @@ class Usuario:
         return is_valid
 
     @classmethod
+    def obtener_usuarios_por_viaje(cls, viaje_id):
+        """
+        Lista los usuarios que se unieron a un viaje (incluye creador si está en la tabla de relación).
+        """
+        query = (
+            "SELECT u.* FROM usuarios u "
+            "JOIN usuarios_viajes uv ON u.id = uv.usuario_id "
+            "WHERE uv.viaje_id = %(viaje_id)s;"
+        )
+        resultados = connectToMySQL(cls.db).query_db(query, {"viaje_id": viaje_id})
+        return [cls(r) for r in resultados] if resultados else []
+
+    @classmethod
     def actualizar_usuario(cls, data, usuario_id):
         """
         Actualizar información del usuario
@@ -152,3 +165,31 @@ class Usuario:
             is_valid = False
             
         return is_valid
+    
+    @classmethod
+    def obtener_usuarios_por_viaje(cls, viaje_id):
+        """
+        Devuelve todos los usuarios que participan en un viaje específico
+        """
+        query = """
+            SELECT u.* FROM usuarios u
+            JOIN usuarios_viajes uv ON u.id = uv.usuario_id
+            WHERE uv.viaje_id = %(viaje_id)s;
+        """
+        data = {"viaje_id": viaje_id}
+        resultados = connectToMySQL(cls.db).query_db(query, data)
+        return [cls(resultado) for resultado in resultados] if resultados else []
+    
+    @classmethod
+    def obtener_viajes_unidos_por_usuario(cls, usuario_id):
+        """
+        Devuelve todos los viajes en los que un usuario está unido
+        """
+        query = """
+            SELECT v.* FROM viajes v
+            JOIN usuarios_viajes uv ON v.id = uv.viaje_id
+            WHERE uv.usuario_id = %(usuario_id)s;
+        """
+        data = {"usuario_id": usuario_id}
+        resultados = connectToMySQL(cls.db).query_db(query, data)
+        return [cls(resultado) for resultado in resultados] if resultados else []

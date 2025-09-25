@@ -10,6 +10,10 @@ def create_app():
     app.secret_key = os.getenv("SECRET_KEY")
     
     # Registrar blueprints
+    from app.controllers.usuarios import bp as usuarios_bp
+    from app.controllers.viajes import bp as viajes_bp
+    app.register_blueprint(usuarios_bp)
+    app.register_blueprint(viajes_bp)
 
     
     # Filtro personalizado para formatear fechas

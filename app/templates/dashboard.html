@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Panel de viajes{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="mb-0">Hola, {{ usuario.nombre }} 👋</h2>
+    <p class="text-muted">Organiza y únete a travesías con tus amigos</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">Crear viaje</button>
+  
+</div>
+
+<div class="row g-4">
+  <div class="col-12 col-lg-6">
+    <div class="card glass-card">
+      <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <strong>Tu agenda de viajes</strong>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Destino</th>
+              <th>Desde</th>
+              <th>Hasta</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for v in viajes_creados_por_usuario %}
+            <tr>
+              <td>
+                <a href="/travels/detalle/{{ v.id }}" class="link-table">{{ v.titulo }}</a>
+                <span class="badge text-bg-secondary ms-2">Creado por ti</span>
+              </td>
+              <td>{{ v.fecha_inicio|format_date }}</td>
+              <td>{{ v.fecha_fin|format_date }}</td>
+              <td class="text-end">
+                <form action="/travels/validar_edicion" method="POST" class="d-inline">
+                  <input type="hidden" name="viaje_id" value="{{ v.id }}" />
+                  <button class="btn btn-sm btn-outline-primary">Editar</button>
+                </form>
+                <form action="/travels/eliminar/{{ v.id }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar viaje?');">
+                  <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+            {% for v in viajes_unidos %}
+            <tr>
+              <td>
+                <a href="/travels/detalle/{{ v.id }}" class="link-table">{{ v.titulo }}</a>
+                <span class="badge text-bg-info ms-2">Unido</span>
+              </td>
+              <td>{{ v.fecha_inicio|format_date }}</td>
+              <td>{{ v.fecha_fin|format_date }}</td>
+              <td class="text-end">
+                <form action="/travels/salir/{{ v.id }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar asistencia?');">
+                  <button class="btn btn-sm btn-outline-warning">Cancelar</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+            {% if not viajes_creados_por_usuario and not viajes_unidos %}
+            <tr>
+              <td colspan="4" class="text-center text-muted">Aún no tienes viajes programados.</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6">
+    <div class="card glass-card">
+      <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <strong>Viajes de otros usuarios</strong>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Destino</th>
+              <th>Desde</th>
+              <th>Hasta</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for v in viajes_disponibles %}
+            <tr>
+              <td><a href="/travels/detalle/{{ v.id }}" class="link-table">{{ v.titulo }}</a></td>
+              <td>{{ v.fecha_inicio|format_date }}</td>
+              <td>{{ v.fecha_fin|format_date }}</td>
+              <td class="text-end">
+                <form action="/travels/unir/{{ v.id }}" method="POST" class="d-inline">
+                  <button class="btn btn-sm btn-success">Unirme</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+            {% if not viajes_disponibles %}
+            <tr>
+              <td colspan="4" class="text-center text-muted">No hay viajes disponibles por ahora.</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal crear viaje -->
+<div class="modal fade" id="modalCrear" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/travels/crear" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title">Nuevo viaje</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Destino</label>
+            <input type="text" name="titulo" class="form-control" required minlength="3" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea name="descripcion" class="form-control" rows="3" required minlength="10"></textarea>
+          </div>
+          <div class="row g-3">
+            <div class="col">
+              <label class="form-label">Desde</label>
+              <input type="date" name="fecha_inicio" class="form-control" required />
+            </div>
+            <div class="col">
+              <label class="form-label">Hasta</label>
+              <input type="date" name="fecha_fin" class="form-control" required />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button class="btn btn-primary">Crear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+

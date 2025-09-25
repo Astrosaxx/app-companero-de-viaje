@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Acceder | Compañero de Viaje{% endblock %}
+{% block content %}
+<div class="row justify-content-center align-items-stretch g-4">
+  <div class="col-12 col-lg-5">
+    <div class="card glass-card p-4">
+      <h2 class="mb-3">Crear cuenta</h2>
+      <form action="/usuarios/procesar_registro" method="POST" class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nombre</label>
+          <input type="text" name="nombre" class="form-control" required minlength="3" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Apellido</label>
+          <input type="text" name="apellido" class="form-control" required minlength="3" />
+        </div>
+        <div class="col-12">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Contraseña</label>
+          <input type="password" name="password" class="form-control" required minlength="8" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Confirmar contraseña</label>
+          <input type="password" name="confirm_password" class="form-control" required minlength="8" />
+        </div>
+        <div class="col-12 d-grid">
+          <button class="btn btn-primary">Registrarme</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="col-12 col-lg-5">
+    <div class="card glass-card p-4 h-100">
+      <h2 class="mb-3">Iniciar sesión</h2>
+      <form action="/usuarios/procesar_login" method="POST" class="row g-3">
+        <div class="col-12">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" required />
+        </div>
+        <div class="col-12">
+          <label class="form-label">Contraseña</label>
+          <input type="password" name="password" class="form-control" required minlength="8" />
+        </div>
+        <div class="col-12 d-grid">
+          <button class="btn btn-success">Entrar</button>
+        </div>
+      </form>
+      <div class="mt-4 text-muted small">
+        Consejo: usa una contraseña de 8+ caracteres.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

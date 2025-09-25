@@ -1,0 +1,16 @@
+:root{--navy:#0b2b40;--teal:#1eb6c1;--mint:#dff7f9;--sand:#fff6e5;--ink:#12222e}
+html,body{height:100%}
+body{font-family:'Outfit',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink)}
+.bg-gradient{background:linear-gradient(135deg,var(--mint),#e8f3ff 30%,#fff)}
+.bg-navy{background:var(--navy)!important}
+.brand-logo{font-size:1.25rem}
+.glass-card{background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid rgba(12,37,53,.08);border-radius:14px;padding:1rem}
+.table> :not(caption)>*>*{background:transparent}
+.link-table{text-decoration:none}
+.link-table:hover{text-decoration:underline}
+.flash-container{position:relative;z-index:5;margin-bottom:1rem}
+footer{opacity:.75}
+/* botones */
+.btn-primary{background:var(--teal);border-color:var(--teal)}
+.btn-primary:hover{filter:brightness(.95)}
+

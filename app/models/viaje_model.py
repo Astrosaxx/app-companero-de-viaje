@@ -34,18 +34,41 @@ class Viaje:
     
     @classmethod
     def unir_usuario(cls, usuario_id, viaje_id):
+        # Evitar duplicados
+        existe_q = "SELECT 1 FROM usuarios_viajes WHERE usuario_id=%(usuario_id)s AND viaje_id=%(viaje_id)s;"
+        data = {"usuario_id": usuario_id, "viaje_id": viaje_id}
+        existe = connectToMySQL(db).query_db(existe_q, data)
+        if existe:
+            return None
         query = """
-        INSERT INTO usuarios_viajes (usuario_id, viaje_id)
-        VALUES (%(usuario_id)s, %(viaje_id)s);
+            INSERT INTO usuarios_viajes (usuario_id, viaje_id)
+            VALUES (%(usuario_id)s, %(viaje_id)s);
         """
-        data = {'usuario_id': usuario_id, 'viaje_id': viaje_id}
         return connectToMySQL(db).query_db(query, data)
 
     @classmethod
     def salir_usuario(cls, usuario_id, viaje_id):
-        query = "DELETE FROM usuarios_viajes WHERE usuario_id = %(usuario_id)s AND viaje_id = %(viaje_id)s;"
-        data = {'usuario_id': usuario_id, 'viaje_id': viaje_id}
+        query = """
+            DELETE FROM usuarios_viajes
+            WHERE usuario_id = %(usuario_id)s AND viaje_id = %(viaje_id)s;
+        """
+        data = {
+            "usuario_id": usuario_id,
+            "viaje_id": viaje_id
+        }
         return connectToMySQL(db).query_db(query, data)
+
+    @classmethod
+    def obtener_viajes_usuario(cls, usuario_id):
+        query = """
+            SELECT v.* FROM viajes v
+            JOIN usuarios_viajes uv ON v.id = uv.viaje_id
+            WHERE uv.usuario_id = %(usuario_id)s;
+        """
+        data = {"usuario_id": usuario_id}
+        resultados = connectToMySQL(db).query_db(query, data)
+        return [cls(r) for r in resultados] if resultados else []
+
 
     
     @classmethod
@@ -69,9 +92,11 @@ class Viaje:
         return resultado
     
     @classmethod
-    def eliminar_viaje(cls, viaje_id):
+    def eliminar_viaje(cls, viaje_id, usuario_id):
+        # Borrar relaciones primero por integridad referencial
+        connectToMySQL(db).query_db("DELETE FROM usuarios_viajes WHERE viaje_id = %(id)s;", {'id': viaje_id})
         query = "DELETE FROM viajes WHERE id = %(id)s AND creado_por = %(creado_por)s;"
-        data = {'id': viaje_id}
+        data = {'id': viaje_id, 'creado_por': usuario_id}
         resultado = connectToMySQL(db).query_db(query, data)
         return resultado
     

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Detalle del viaje{% endblock %}
+{% block content %}
+
+<div class="row g-4">
+  <div class="col-12 col-lg-8">
+    <div class="card glass-card p-4">
+      <a href="/travels/" class="small mb-2 d-inline-flex align-items-center gap-1">← Volver</a>
+      <h2 class="mb-1">{{ viaje.titulo }}</h2>
+      <div class="text-muted mb-3">Del {{ viaje.fecha_inicio|format_date }} al {{ viaje.fecha_fin|format_date }}</div>
+      <p class="lead">{{ viaje.descripcion }}</p>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card glass-card p-4">
+      <h5 class="mb-3">Usuarios que se unieron</h5>
+      <ul class="list-unstyled mb-0">
+        {% for u in participantes %}
+          {% if u.id != viaje.creado_por %}
+          <li class="py-2 border-bottom">{{ u.nombre }} {{ u.apellido }}</li>
+          {% endif %}
+        {% endfor %}
+        {% if participantes|length == 0 %}
+          <li class="text-muted">Aún no hay participantes.</li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
