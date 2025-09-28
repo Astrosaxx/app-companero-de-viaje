@@ -34,15 +34,22 @@ class Viaje:
     
     @classmethod
     def unir_usuario(cls, usuario_id, viaje_id):
+        # Verificar que el viaje existe
+        viaje = cls.obtener_por_id(viaje_id)
+        if not viaje:
+            return False
+        
         # Evitar duplicados
         existe_q = "SELECT 1 FROM usuarios_viajes WHERE usuario_id=%(usuario_id)s AND viaje_id=%(viaje_id)s;"
         data = {"usuario_id": usuario_id, "viaje_id": viaje_id}
         existe = connectToMySQL(db).query_db(existe_q, data)
         if existe:
             return None
+        
+        # Unir usuario con rol_id = 2 (participante)
         query = """
-            INSERT INTO usuarios_viajes (usuario_id, viaje_id)
-            VALUES (%(usuario_id)s, %(viaje_id)s);
+            INSERT INTO usuarios_viajes (usuario_id, viaje_id, rol_id)
+            VALUES (%(usuario_id)s, %(viaje_id)s, 2);
         """
         return connectToMySQL(db).query_db(query, data)
 
@@ -68,6 +75,17 @@ class Viaje:
         data = {"usuario_id": usuario_id}
         resultados = connectToMySQL(db).query_db(query, data)
         return [cls(r) for r in resultados] if resultados else []
+
+    @classmethod
+    def usuario_ya_unido(cls, usuario_id, viaje_id):
+        """Verifica si un usuario ya está unido a un viaje específico"""
+        query = """
+            SELECT 1 FROM usuarios_viajes 
+            WHERE usuario_id = %(usuario_id)s AND viaje_id = %(viaje_id)s;
+        """
+        data = {"usuario_id": usuario_id, "viaje_id": viaje_id}
+        resultado = connectToMySQL(db).query_db(query, data)
+        return bool(resultado)
 
 
     

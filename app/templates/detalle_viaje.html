@@ -2,28 +2,101 @@
 {% block title %}Detalle del viaje{% endblock %}
 {% block content %}
 
-<div class="row g-4">
+<div class="row g-4 fade-in-up">
   <div class="col-12 col-lg-8">
     <div class="card glass-card p-4">
-      <a href="/travels/" class="small mb-2 d-inline-flex align-items-center gap-1">← Volver</a>
-      <h2 class="mb-1">{{ viaje.titulo }}</h2>
-      <div class="text-muted mb-3">Del {{ viaje.fecha_inicio|format_date }} al {{ viaje.fecha_fin|format_date }}</div>
-      <p class="lead">{{ viaje.descripcion }}</p>
+      <a href="/travels/" class="small mb-3 d-inline-flex align-items-center gap-1 text-decoration-none">
+        <i class="fas fa-arrow-left"></i> Volver al dashboard
+      </a>
+      <div class="d-flex align-items-center mb-4">
+        <div class="me-3">
+          <i class="fas fa-map-marker-alt text-primary fs-2"></i>
+        </div>
+        <div>
+          <h2 class="mb-1 text-gradient">{{ viaje.titulo }}</h2>
+          <div class="text-muted">
+            <i class="fas fa-calendar-alt me-1"></i>
+            Del {{ viaje.fecha_inicio|format_date }} al {{ viaje.fecha_fin|format_date }}
+          </div>
+        </div>
+      </div>
+      <div class="bg-light p-3 rounded">
+        <p class="lead mb-0">{{ viaje.descripcion }}</p>
+      </div>
     </div>
   </div>
   <div class="col-12 col-lg-4">
     <div class="card glass-card p-4">
-      <h5 class="mb-3">Usuarios que se unieron</h5>
+      <div class="d-flex align-items-center mb-3">
+        <i class="fas fa-users text-primary me-2"></i>
+        <h5 class="mb-0">Participantes del viaje</h5>
+        <span class="badge text-bg-primary ms-auto">{{ participantes|length }}</span>
+      </div>
       <ul class="list-unstyled mb-0">
         {% for u in participantes %}
-          {% if u.id != viaje.creado_por %}
-          <li class="py-2 border-bottom">{{ u.nombre }} {{ u.apellido }}</li>
-          {% endif %}
+          <li class="py-3 border-bottom d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <div class="me-3">
+                {% if u.id == viaje.creado_por %}
+                  <i class="fas fa-crown text-warning"></i>
+                {% else %}
+                  <i class="fas fa-user text-success"></i>
+                {% endif %}
+              </div>
+              <span class="fw-medium">{{ u.nombre }} {{ u.apellido }}</span>
+            </div>
+            {% if u.id == viaje.creado_por %}
+              <span class="badge text-bg-primary">Organizador</span>
+            {% else %}
+              <span class="badge text-bg-success">Participante</span>
+            {% endif %}
+          </li>
         {% endfor %}
         {% if participantes|length == 0 %}
-          <li class="text-muted">Aún no hay participantes.</li>
+          <li class="text-muted text-center py-3">
+            <i class="fas fa-users d-block mb-2 fs-4"></i>
+            Aún no hay participantes
+          </li>
         {% endif %}
       </ul>
+      
+      {% if viaje.creado_por != usuario.id %}
+        {% set ya_unido = false %}
+        {% for p in participantes %}
+          {% if p.id == usuario.id %}
+            {% set ya_unido = true %}
+          {% endif %}
+        {% endfor %}
+        
+        {% if not ya_unido %}
+          <div class="mt-3">
+            <form action="/travels/unir/{{ viaje.id }}" method="POST">
+              <button class="btn btn-success w-100">
+                <i class="fas fa-plus me-2"></i>Unirme a este viaje
+              </button>
+            </form>
+          </div>
+        {% else %}
+          <div class="mt-3">
+            <div class="alert alert-success d-flex align-items-center mb-3">
+              <i class="fas fa-check-circle me-2"></i>
+              <span>¡Ya estás unido a este viaje!</span>
+            </div>
+            <form action="/travels/salir/{{ viaje.id }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres salir de este viaje?');">
+              <button class="btn btn-warning w-100">
+                <i class="fas fa-sign-out-alt me-2"></i>Salir del viaje
+              </button>
+            </form>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="mt-3">
+          <div class="alert alert-primary d-flex align-items-center">
+            <i class="fas fa-crown me-2"></i>
+            <span>Eres el organizador de este viaje</span>
+          </div>
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>

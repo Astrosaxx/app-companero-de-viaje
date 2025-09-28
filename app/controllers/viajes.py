@@ -122,18 +122,19 @@ def unir_viaje(viaje_id):
         flash("No puedes unirte a tu propio viaje.", 'error')
         return redirect('/travels')
     
+    # Verificar si ya está unido
+    if Viaje.usuario_ya_unido(session['usuario_id'], viaje_id):
+        flash("Ya estás unido a este viaje.", 'error')
+        return redirect('/travels')
+    
     resultado = Viaje.unir_usuario(session['usuario_id'], viaje_id)
     if resultado is None:
         flash("Ya estás unido a este viaje.", 'error')
     elif resultado is False:
         flash("No se pudo unir al viaje. Inténtalo nuevamente.", 'error')
     else:
-        # Verifica inmediatamente si aparece en la membresía
-        unidos = Viaje.obtener_viajes_usuario(session['usuario_id'])
-        if any(v.id == viaje_id for v in unidos):
-            flash("¡Te has unido al viaje exitosamente!", 'exito')
-        else:
-            flash("No se pudo confirmar la unión al viaje.", 'error')
+        flash("¡Te has unido al viaje exitosamente!", 'exito')
+    
     return redirect('/travels')
 
 @bp.route('/salir/<int:viaje_id>', methods=['POST'])
@@ -165,6 +166,13 @@ def detalle_viaje(viaje_id):
     
     usuario = Usuario.obtener_por_id(session['usuario_id'])
     participantes = Usuario.obtener_usuarios_por_viaje(viaje_id)
+    
+    # Asegurar que el creador esté en la lista de participantes
+    creador_en_lista = any(p.id == viaje.creado_por for p in participantes)
+    if not creador_en_lista:
+        creador = Usuario.obtener_por_id(viaje.creado_por)
+        if creador:
+            participantes.insert(0, creador)
     
     return render_template('detalle_viaje.html', viaje=viaje, usuario=usuario, participantes=participantes)
 

@@ -166,19 +166,6 @@ class Usuario:
             
         return is_valid
     
-    @classmethod
-    def obtener_usuarios_por_viaje(cls, viaje_id):
-        """
-        Devuelve todos los usuarios que participan en un viaje específico
-        """
-        query = """
-            SELECT u.* FROM usuarios u
-            JOIN usuarios_viajes uv ON u.id = uv.usuario_id
-            WHERE uv.viaje_id = %(viaje_id)s;
-        """
-        data = {"viaje_id": viaje_id}
-        resultados = connectToMySQL(cls.db).query_db(query, data)
-        return [cls(resultado) for resultado in resultados] if resultados else []
     
     @classmethod
     def obtener_viajes_unidos_por_usuario(cls, usuario_id):
